@@ -1,7 +1,7 @@
 # n8n-arc
 AI agent for complete automation of customer service, scheduling and marketing for Lizi Hair salon, built with n8n.
 
-# 🤖 Digital Concierge Agent - Lizi Hair
+#  Digital Concierge Agent - Lizi Hair
 
 ## Project Overview
 
@@ -45,7 +45,7 @@ F4 -- send message to --> Customer;
  - Post-Service Follow-up: Contacts clients after the appointment to ask for feedback and suggest products, increasing loyalty and revenue.
  - Loyalty Campaigns: Automatically sends birthday vouchers and campaigns to reactivate inactive clients.
 
-📂 Repository Structure
+ Repository Structure
 /workflows: Contains the JSON files for each n8n workflow.
 
 1_Indexing_Pipeline.json
@@ -55,7 +55,7 @@ F4 -- send message to --> Customer;
 5_Reservation_Cleaner.json
 
 
-🚀 How to Use
+ How to Use
 
  - Database Setup: Follow the instructions in /docs/supabase_setup.md to create and configure your vector table in Supabase.
  - Import Flows: Import the JSON files from the /workflows folder to your n8n instance.
@@ -63,7 +63,7 @@ F4 -- send message to --> Customer;
  - Run Indexing: Run the 1_Indexing_Pipeline.json flow once to create the dataset with the website information.
  - Activate the Flows: Activate the remaining flows for the system to begin operating.
 
-💻 Technologies Used
+ Technologies Used
 
  - Automation Platform: n8n.io
  - AI and LLMs: OpenAI (GPT-4o-mini), Google (Gemini)
