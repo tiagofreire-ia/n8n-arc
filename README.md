@@ -7,7 +7,7 @@ AI agent for complete automation of customer service, scheduling and marketing f
 
 This repository contains the workflows and documentation for the Lizi Hair salon's intelligent automation system. The project implements a multifunctional AI agent that acts as a digital concierge, combining RAG (Search Augmented Generation) capabilities to provide accurate information and SDR (Sales Development Representative) capabilities to actively guide clients toward scheduling and loyalty.
 
-## 🏛️ System Architecture
+##  System Architecture
 
 The system is built on a microservices architecture using n8n workflows, ensuring modularity and scalability.
 
