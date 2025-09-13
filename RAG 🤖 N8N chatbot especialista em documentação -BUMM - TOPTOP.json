@@ -1,0 +1,1221 @@
+{
+  "name": "RAG 🤖 N8N chatbot especialista em documentação -BUMM - TOPTOP",
+  "nodes": [
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "id": "26bd501a-d449-4bbf-aa25-a02e5cca7964",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1856,
+        3424
+      ],
+      "typeVersion": 1.3,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.documentation }}",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "id": "2916c373-0c6b-4315-a14d-481d674a324f",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3568,
+        1904
+      ],
+      "typeVersion": 1.1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "chunkSize": 1500,
+        "chunkOverlap": 200,
+        "options": {
+          "splitCode": "markdown"
+        }
+      },
+      "id": "8b411025-ad1f-4656-84d7-902ced049923",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3664,
+        2112
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.documentation }}",
+        "options": {
+          "scope": "node",
+          "historySize": 10000
+        }
+      },
+      "id": "4855516e-4a0d-4881-8dc4-592cf8b133a9",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Remove Duplicate Documentation Content",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2944,
+        1680
+      ],
+      "typeVersion": 2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "52b8b89a-30cd-4a0d-a428-e5d341bcebbf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              },
+              "leftValue": "={{ $json.link }}",
+              "rightValue": "/"
+            },
+            {
+              "id": "d8019c4e-e1a1-43ec-93a8-dac3d8c083b6",
+              "operator": {
+                "type": "string",
+                "operation": "notStartsWith"
+              },
+              "leftValue": "={{ $json.link }}",
+              "rightValue": "https://"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a33a791a-e328-46fc-890e-e18649ab2231",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Only Keep Doc Paths",
+      "type": "n8n-nodes-base.filter",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3072,
+        912
+      ],
+      "typeVersion": 2.2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5ed964a6-5200-454c-b983-f3dc7c8c7a48",
+              "name": "documentation",
+              "type": "string",
+              "value": "={{ $json.data.replace(/([^#\\n]+)\\s*#/g, '# $1').trim().replace(/^\\s*https?:\\/\\/\\S+\\s*/, '') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b07b416b-f5cd-439a-b935-ce58c2a2f180",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Clean Documentation",
+      "type": "n8n-nodes-base.set",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2512,
+        1680
+      ],
+      "typeVersion": 3.4,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0
+        }
+      },
+      "id": "4198449e-feb7-43f2-be23-e8581ff9fd98",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Gemini 2.5 Flash",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1504,
+        3424
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NymvM2XxUX5ECFUy",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      },
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "url": "https://docs.n8n.io/",
+        "options": {}
+      },
+      "id": "e1bad122-5df4-4018-8b50-fc67f70b55b7",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Get All n8n Documentation Links",
+      "type": "n8n-nodes-base.httpRequest",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1920,
+        912
+      ],
+      "typeVersion": 4.2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "links",
+              "cssSelector": "a",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "626cf083-8ae3-4e28-96d2-92b01f6d36cd",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Extract Links from HTML",
+      "type": "n8n-nodes-base.html",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2208,
+        912
+      ],
+      "typeVersion": 1.2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "links",
+        "options": {
+          "destinationFieldName": "link"
+        }
+      },
+      "id": "e980ad18-7857-4603-8e01-9a98520dd874",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Split Out Links",
+      "type": "n8n-nodes-base.splitOut",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2544,
+        912
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "link",
+        "options": {}
+      },
+      "id": "2b441068-ead3-4114-baca-f26f95c2c2eb",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Remove Duplicate Links",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2848,
+        912
+      ],
+      "typeVersion": 2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        },
+        "workflowInputs": {
+          "value": {},
+          "schema": [
+            {
+              "id": "path",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "required": false,
+              "displayName": "path",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "data"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "a9196d50-2a7a-4733-b6e4-2cb03a5cda46",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Add Documentation Page to Vector Store",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3584,
+        944
+      ],
+      "typeVersion": 1.2,
+      "alwaysOutputData": true,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.n8n.io/{{ $json.link }}",
+        "options": {}
+      },
+      "id": "1c772047-a2f9-427a-b090-dbf00a257c9c",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Get Documentation Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1984,
+        1680
+      ],
+      "typeVersion": 4.2,
+      "onError": "continueErrorOutput",
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "data",
+              "cssSelector": "article",
+              "skipSelectors": "img, footer, form"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d7cd75ad-e76d-45c7-8791-e6b9cf0e2106",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Extract Documentation Content",
+      "type": "n8n-nodes-base.html",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2288,
+        1680
+      ],
+      "typeVersion": 1.2,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {},
+      "id": "5ac3f64f-0340-4a98-bace-1c156021a919",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Gemini Query Embedding",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2224,
+        3616
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NymvM2XxUX5ECFUy",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      },
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {},
+      "id": "cbcc6097-c4a7-45d4-a852-5ab69d8f1e14",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Gemini Chunk Embedding",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3360,
+        1888
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NymvM2XxUX5ECFUy",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      },
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Parte 1: Construindo a Base de Conhecimento (A Biblioteca)\n\n**Objetivo:** Ler toda a documentação do n8n, dividi-la em pequenos pedaços e armazená-la no **armazenamento de vetores na memória** do n8n.\n**Ação:** Você só precisa executar esta parte **UMA VEZ** por sessão do n8n clicando no botão \"Executar fluxo de trabalho\" no gatilho `Iniciar Indexação`.\n**Tempo:** Isso levará vários minutos para ser concluído (~15 a 20).\n\n**Importante:** O armazenamento na memória não é permanente. Se você reiniciar o n8n, deverá executar este fluxo de indexação novamente para reconstruir a base de conhecimento.",
+        "height": 1760,
+        "width": 2640,
+        "color": 7
+      },
+      "id": "ba1f2848-bd94-4180-8edd-38150cda7f0b",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1328,
+        560
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "3cda1636-2dfd-46c0-8d82-d072e7be673e",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Loop Over Documentation Pages",
+      "type": "n8n-nodes-base.splitInBatches",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3360,
+        912
+      ],
+      "typeVersion": 3,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "# Tutorial: Crie um Especialista em IA com RAG\n\nBem-vindo! Este fluxo de trabalho ensina **RAG (Recuperação-Geração Aumentada)** usando as ferramentas integradas do n8n.\n\n**Objetivo:** Criar um chatbot de IA que seja especialista em um tópico específico (a documentação do n8n) e *nunca* invente respostas.\n\n**Tem duas partes:**\n1. **FLUXO SUPERIOR (Indexação):** Você executa isso manualmente uma vez para construir a base de conhecimento da IA. Ele lê a documentação do n8n e a armazena no **armazenamento de vetores na memória** do n8n.\n2. **FLUXO INFERIOR (Chat):** Este é o chatbot ativo. Ele recupera informações relevantes da base de conhecimento para responder às suas perguntas com precisão.",
+        "height": 296,
+        "width": 1064,
+        "color": 6
+      },
+      "id": "ffa9c491-00d0-4c70-8a59-64f627b6468f",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "# Workflow Setup",
+        "height": 1392,
+        "width": 924,
+        "color": 7
+      },
+      "id": "6f33666c-868b-4032-99c6-9844a809a587",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        368,
+        560
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=<função>\nVocê é um assistente especializado em IA, especialista na documentação oficial do n8n. Sua única missão é ajudar os usuários, fornecendo informações precisas e factuais, extraídas exclusivamente desta documentação. Você é meticuloso, factual e nunca se desvia do seu escopo de conhecimento.\n</função>\n\n<instruções>\n<objetivo>\nSeu principal objetivo é fornecer respostas precisas e factuais às perguntas dos usuários sobre a plataforma de automação n8n, com base **exclusivamente** nos trechos da documentação oficial fornecida no contexto.\n</objetivo>\n\n<contexto>\nVocê opera de acordo com um modelo RAG (Recuperação-Geração Aumentada). Para cada pergunta do usuário, use a ferramenta apropriada para recuperar as informações necessárias do banco de dados de vetores da documentação do n8n.\n\n**Regras obrigatórias:**\n\n1. **Fonte única da verdade:** Sua resposta DEVE ser derivada total e exclusivamente das informações presentes na documentação fornecida.\n2. **Precisão e citação implícita:** Baseie sua resposta o mais literalmente possível no texto da documentação. Reformule para maior clareza e concisão, mas não adicione nenhuma informação que não esteja lá. Aja como se a documentação fosse seu único conhecimento no mundo.\n3. **Não mencione o processo:** Nunca mencione sua ferramenta ou o fato de você ser um sistema RAG em sua resposta ao usuário. Responda como um especialista que consulta diretamente a documentação.\n</context>\n\n<output_format>\n* **Clareza:** Forneça uma resposta clara, concisa e direta.\n* **Estruturação:** Se o contexto contiver etapas, listas ou exemplos de código, use a sintaxe Markdown para formatá-los de forma legível (marcadores, listas numeradas, blocos de código para trechos de código, JSON, etc.).\n* **Tom:** Adote um tom profissional, prestativo e confiante, o de um especialista técnico em N8N.\n</output_format>\n</instructions>"
+        }
+      },
+      "id": "6b8d3bba-6a47-4dc6-b970-219a35863782",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "n8n Docs AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1872,
+        2816
+      ],
+      "typeVersion": 2.1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.1: Encontrar todos os \"Livros\"\n\n**O que faz:** Este nó acessa a página principal de documentação do n8n.\n**Analogia:** Estamos pedindo à recepção da biblioteca uma lista completa de todos os livros disponíveis.",
+        "height": 400,
+        "width": 288,
+        "color": 7
+      },
+      "id": "6a7912bb-20a6-44bc-ab08-7a1e227797ab",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1824,
+        704
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.2: Ler a Lista de Livros\n\n**O que faz:** Pega o HTML da etapa anterior e extrai todos os links (tag `<a>`).\n**Analogia:** Estamos lendo a lista da recepção e extraindo apenas os títulos dos livros (os links).",
+        "height": 400,
+        "width": 272,
+        "color": 7
+      },
+      "id": "a094ca81-3cb1-42b3-bcce-202da80ac5ea",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2128,
+        704
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.3: Processar um livro por vez\n\n**O que faz:** Pega a grande lista de links e transforma cada link em um item separado para o n8n processar.\n**Analogia:** Em vez de tentar ler todos os livros de uma vez, estamos criando uma tarefa separada para cada livro.",
+        "height": 400,
+        "width": 336,
+        "color": 7
+      },
+      "id": "d3c9c411-34fb-4f5e-a46e-a1cfb5130f53",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2416,
+        704
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.4: Organizar a Lista de Tarefas\n\n**O que faz:** Primeiro, remove todos os links duplicados. Em seguida, filtra todos os links que não apontam para uma página de documentação real (por exemplo, links para a página inicial ou sites externos).\n**Analogia:** Estamos descartando itens de tarefas duplicados e quaisquer notas que não sejam livros.",
+        "height": 400,
+        "width": 480,
+        "color": 7
+      },
+      "id": "0cec3147-5420-4f89-8dd9-b49462e6a631",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2768,
+        704
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.5: O Loop de Leitura do Bibliotecário\n\n**O que ele faz:** Este é o mecanismo do processo de indexação. Ele pega nossa lista limpa de páginas e as processa uma a uma. O nó `Executar Fluxo de Trabalho` chama o \"subfluxo de trabalho\" abaixo para cada página.\n**Analogia:** Este loop informa ao nosso bibliotecário para pegar um livro (link) por vez e passar por todo o processo de leitura e indexação.",
+        "height": 464,
+        "width": 512,
+        "color": 4
+      },
+      "id": "abf15718-553e-4226-8e85-28a7e2864c34",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note10",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3264,
+        704
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.5.1: Ler uma única página\n\n**O que faz:** Este nó recebe uma única URL do loop e busca o conteúdo HTML dessa página.\n**Analogia:** O bibliotecário abre um livro na primeira página.",
+        "height": 384,
+        "width": 288,
+        "color": 7
+      },
+      "id": "162390aa-5dfa-4e2d-ad27-59bd00eea840",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note11",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1888,
+        1472
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Por que usar um subfluxo de trabalho?\n\nO principal motivo é o **gerenciamento de memória**.\n\nO processamento de uma única página da web, especialmente a criação de embeddings vetoriais para todos os seus blocos, consome muita memória (RAM). A documentação do n8n tem mais de 1.000 páginas. Se tentássemos processar todas elas em uma única execução linear, o uso de memória aumentaria a cada página e provavelmente travaria sua instância do n8n.\n\nQuando um subfluxo de trabalho termina a execução de um item (uma página), o n8n **limpa a memória** (RAM) usada antes de iniciar a próxima.\n\nAo usar um subfluxo de trabalho, processamos as páginas uma a uma em um loop com uso eficiente de memória, tornando todo o processo de indexação estável e confiável, mesmo em grande escala.",
+        "height": 528,
+        "width": 512,
+        "color": 5
+      },
+      "id": "c516a2da-d6c1-4da7-8a30-4540af69c2f0",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note12",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1360,
+        1328
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.5.2: Obtenha o que é bom\n\n**O que faz:** Extrai apenas o texto principal do artigo na página, ignorando menus, rodapés e imagens. Em seguida, limpa a formatação.\n**Analogia:** O bibliotecário arranca apenas as páginas úteis do livro e limpa quaisquer manchas ou caligrafia desleixada.",
+        "height": 384,
+        "width": 512,
+        "color": 7
+      },
+      "id": "c2474781-cffe-48e5-a8c3-c19b30821ab6",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note13",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2192,
+        1472
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.5.3: Evitar Releitura\n\n**O que faz:** Verifica se já processamos o conteúdo exato desta página em uma execução anterior. Em caso afirmativo, para por aqui para economizar tempo e recursos.\n**Analogia:** O bibliotecário verifica sua pilha de \"já lidos\" para evitar ler o mesmo livro duas vezes.\n\n**Um Recurso Poderoso Explicado:**\n\nNormalmente, o nó \"Remover Duplicatas\" analisa apenas os itens na execução *atual*. Mas aqui, ele está definido como **\"Remover itens vistos em execuções anteriores.\"**\n\nIsso é incrivelmente poderoso em um subfluxo de trabalho. Embora nosso subfluxo de trabalho veja apenas uma página por vez, este nó tem memória de longo prazo. Ele se lembra de cada página que *já* processou em todas as execuções anteriores.\n\nIsso torna o fluxo de trabalho robusto. Você pode executar o processo de indexação repetidamente para atualizar a base de conhecimento com nova documentação, e nunca desperdiçará recursos reprocessando páginas antigas ou criando blocos duplicados no armazenamento na memória.",
+        "height": 640,
+        "width": 544,
+        "color": 5
+      },
+      "id": "70fbb1bd-1cfd-47ed-ad46-48f1d7ee9194",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2720,
+        1216
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Etapa 1.5.4: Criar e armazenar os 'Ficheiros Mágicos de Índice'\n\nEsta é a etapa mais importante da indexação!\n\n1. **`Divisor de Texto de Caracteres Recursivos`:** O texto é dividido em pequenos parágrafos sobrepostos (\"blocos\").\n* **Analogia:** O bibliotecário divide o livro em parágrafos pequenos e significativos. Isso é vital para encontrar respostas bem específicas posteriormente.\n\n2. **`Inserção de Blocos Gemini`:** Um modelo de IA converte cada bloco de texto em uma lista de números (um \"vetor\" ou \"incorporação\").\n* **Analogia:** O bibliotecário usa uma 'caneta mágica' para transformar cada parágrafo em um conjunto único de números. Parágrafos com significados semelhantes recebem números semelhantes.\n\n3. **`Armazenamento de Vetor Simples (Inserir)`:** O bloco de texto original e seu novo vetor são salvos juntos no armazenamento de vetores na memória do n8n.\n\n* **Analogia:** O bibliotecário arquiva o parágrafo original, juntamente com seu número mágico, em um cartão de índice e o coloca em um arquivo especial (o armazenamento vetorial na memória).\n* **A ``Chave de Memória`** neste nó atua como um rótulo para o arquivo, garantindo que o fluxo de bate-papo possa encontrá-lo posteriormente.",
+        "height": 1120,
+        "width": 656,
+        "color": 6
+      },
+      "id": "88930b6a-5ffb-428b-bdb3-689cda2f78d8",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note15",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3280,
+        1168
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Parte 2: O Chatbot (Conversando com o Bibliotecário Especialista)\n\n**Objetivo:** Fornecer uma interface onde um usuário possa fazer uma pergunta, fazer com que o sistema encontre informações relevantes na base de conhecimento e obtenha uma resposta precisa gerada por IA.\n**Ação:** Após executar o fluxo de indexação, **Ative** este fluxo de trabalho. Em seguida, abra o nó `Quando mensagem de bate-papo recebida` e use sua URL pública para conversar.",
+        "height": 1456,
+        "width": 1200,
+        "color": 7
+      },
+      "id": "cb9f3d2c-6eaf-4b6e-aa7f-d0662bc35740",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note16",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1328,
+        2352
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Recepção: Faça sua pergunta aqui\n\n**O que faz:** Esta é a interface de chat pública. Ao enviar uma mensagem aqui, todo o processo de RAG é iniciado.\n\n**Ação:**\n1. **Ative** todo o fluxo de trabalho.\n2. Para testar diretamente no n8n, clique no botão **\"Abrir Chat\"** no painel de parâmetros deste nó.\n3. Para conversar publicamente, copie a **URL Pública** deste nó e abra-a em uma nova aba do navegador.",
+        "height": 448,
+        "width": 368,
+        "color": 4
+      },
+      "id": "ae93c028-a7d2-4d05-b3a7-9789dd4211f9",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note17",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1360,
+        2512
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### O Cérebro: O Bibliotecário Especialista\n\n**O que ele faz:** Este é o agente de IA que orquestra toda a resposta. Ele entende sua pergunta, decide quais ferramentas usar e formula a resposta final.\n**Prompt do Sistema:** Suas instruções (na Mensagem do Sistema) são muito rígidas: **\"Use apenas os documentos fornecidos para responder. Não invente nada.\"**",
+        "height": 400,
+        "width": 560,
+        "color": 5
+      },
+      "id": "d180b0ca-dd3b-40bb-8595-c178f74011e6",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note18",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1744,
+        2624
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### O 'Sintetizador' e o 'Estrategista'\n\n**O que ele faz:** Este é o Large Language Model (LLM). Ele tem duas funções essenciais:\n\n1. **O Estrategista:** Com base na sua pergunta e no histórico da conversa, ele decide *quais informações procurar* na base de conhecimento (a biblioteca).\n2. **O Sintetizador:** Após obter os documentos relevantes, ele gera a resposta final, legível por humanos, com base *apenas* naquele contexto.\n\n**Analogia:** Esta é a parte do cérebro do bibliotecário que primeiro decide qual seção da biblioteca pesquisar e, em seguida, lê os cartões de índice específicos para escrever uma resposta clara e útil.\n\nO modelo usado aqui é o **Gemini 2.5 Flash**.",
+        "height": 592,
+        "width": 368,
+        "color": 7
+      },
+      "id": "42d81e12-bfc9-4b9b-bb8a-40249e163bbb",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1360,
+        2976
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### Memória de Curto Prazo\n\n**O que faz:** Este nó armazena as últimas mensagens da sua conversa.\n**Analogia:** Isso ajuda o bibliotecário a se lembrar do que você acabou de falar, para que você possa fazer perguntas complementares sem precisar se repetir.",
+        "height": 528,
+        "width": 288,
+        "color": 7
+      },
+      "id": "567ecaf4-e42a-4275-bc39-ad7217b4a173",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note20",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1744,
+        3040
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "### A Ferramenta: O Recuperador do 'Arquivo Mágico'\n\nEsta é a parte de \"Recuperação\" do RAG. Quando o agente recebe sua pergunta, ele usa esta ferramenta para encontrar as informações mais relevantes.\n\n1. **`Incorporação de Consulta Gemini`:** Sua pergunta é convertida em seu próprio 'número mágico' (vetor).\n\n2. **`Documentação Oficial n8n (Recuperação de Armazenamento de Vetores)`:** Ele pesquisa no armazenamento de vetores na memória os blocos de documentos com os 'números mágicos' mais semelhantes ao número da sua pergunta.\n\n**Analogia:** O bibliotecário pega sua pergunta, encontra os cartões de índice mais relevantes no arquivo e os entrega ao 'Sintetizador' para formular a resposta.",
+        "height": 736,
+        "width": 448,
+        "color": 6
+      },
+      "id": "120f0062-4e6c-4cac-92ab-51cd7b55e892",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note21",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2048,
+        3040
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {},
+      "id": "b83a63ac-403f-4717-ae8a-6756e42f4b3e",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Start Indexing",
+      "type": "n8n-nodes-base.manualTrigger",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1680,
+        912
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "=Olá! Sou um assistente de IA treinado na documentação oficial do n8n.\nVocê pode me perguntar qualquer coisa sobre nós, fluxos de trabalho ou conceitos do n8n. Por exemplo:\n\"Como funciona o nó IF?\"\n\"O que é um subfluxo de trabalho?\"",
+        "options": {
+          "inputPlaceholder": "Type your n8n related question..",
+          "subtitle": "",
+          "title": "",
+          "customCss": "/* === THEME OVERRIDE: n8n Glass & Glow (Revised) === */\n\n/*\n  This theme is built upon the default n8n chat CSS variables.\n  We'll use your desired branding and layout, and then add\n  the \"glass\" effect using a semi-transparent background\n  and a backdrop-filter on the main window class.\n*/\n\n:root {\n  /* --- 1. CORE BRANDING & FONTS --- */\n  /* Your choices for font and primary color are applied here. */\n  --chat--font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n  --chat--color-primary: #EA4B71; /* n8n Red */\n  --chat--color-primary-shade-50: #D93A60;\n  --chat--color-primary-shade-100: #C82A50;\n  --chat--color-secondary: #20b69e; /* Kept default secondary for things like file uploads */\n  --chat--color-secondary-shade-50: #1ca08a;\n  --chat--color-white: #ffffff;\n  --chat--color-light: #f2f4f8;\n  --chat--color-dark: #1F2937; /* Darker, more modern text color */\n  --chat--color-disabled: #9CA3AF;\n  --chat--color-typing: #404040;\n\n  /* --- 2. WINDOW & LAYOUT --- */\n  /* Your dimensions and rounded corners. The actual glass effect is handled in the class override below. */\n  --chat--window--width: 430px;\n  --chat--window--height: 80vh;\n  --chat--window--border-radius: 16px;\n  --chat--window--border: 1px solid rgba(255, 255, 255, 0.3);\n  --chat--spacing: 1rem; /* 16px base spacing */\n  --chat--window--z-index: 9999;\n  --chat--window--bottom: var(--chat--spacing);\n  --chat--window--right: var(--chat--spacing);\n  --chat--window--margin-bottom: var(--chat--spacing);\n\n  /* --- 3. GLASSMORPHISM BACKGROUNDS --- */\n  /* We make the main sections transparent to let the glass window show through. */\n  --chat--header--background: transparent;\n  --chat--body--background: transparent;\n  --chat--footer--background: transparent;\n\n  /* --- 4. HEADER STYLING (REMOVED) --- */\n  /* The header is removed by setting its height, padding, and border to 0/none. */\n  --chat--header-height: 0;\n  --chat--header--padding: 0;\n  --chat--header--border-bottom: none;\n  /* The rest of the header variables are now irrelevant. */\n  --chat--header--color: var(--chat--color-dark);\n  --chat--heading--font-size: 1.5rem;\n  --chat--subtitle--font-size: 0.875rem;\n  --chat--subtitle--line-height: 1.4;\n  --chat--close--button--color-hover: var(--chat--color-primary);\n\n  /* --- 5. MESSAGE BUBBLES --- */\n  --chat--message--font-size: 0.875rem;\n  --chat--message--padding: 12px 16px;\n  --chat--message--border-radius: 12px;\n  --chat--message-line-height: 1.6;\n  --chat--message--margin-bottom: calc(var(--chat--spacing) * 0.75);\n  /* Adjusted padding: Top is 0, sides and bottom use the base spacing. */\n  --chat--messages-list--padding: 0 var(--chat--spacing) var(--chat--spacing);\n  --chat--message--bot--background: var(--chat--color-white);\n  --chat--message--bot--color: #111827;\n  --chat--message--bot--border: none;\n  --chat--message--user--background: var(--chat--color-primary);\n  --chat--message--user--color: var(--chat--color-white);\n  --chat--message--user--border: none;\n\n  /* --- 6. INPUT AREA --- */\n  --chat--textarea--height: 50px;\n  --chat--textarea--max-height: 10rem;\n  --chat--input--font-size: 0.9rem;\n  --chat--input--border: 0;\n  --chat--input--border-radius: 12px; /* Rounded input field */\n  --chat--input--padding: 12px 16px;\n  --chat--input--background: rgba(255, 255, 255, 0.5); /* Semi-transparent input */\n  --chat--input--text-color: #111827;\n  --chat--input--line-height: 1.5;\n  --chat--input--border-active: 0;\n\n  /* --- 7. SEND & FILE BUTTONS --- */\n  --chat--input--send--button--background: transparent;\n  --chat--input--send--button--color: var(--chat--color-primary);\n  --chat--input--send--button--background-hover: transparent;\n  --chat--input--send--button--color-hover: var(--chat--color-primary-shade-50);\n  --chat--input--file--button--background: transparent;\n  --chat--input--file--button--color: var(--chat--color-secondary);\n  --chat--input--file--button--background-hover: transparent;\n  --chat--input--file--button--color-hover: var(--chat--color-secondary-shade-50);\n\n  /* --- 8. TOGGLE BUTTON & OTHERS --- */\n  /* Using your primary brand color for the main toggle button */\n  --chat--toggle--size: 64px;\n  --chat--toggle--width: var(--chat--toggle--size);\n  --chat--toggle--height: var(--chat--toggle--size);\n  --chat--toggle--border-radius: 50%;\n  --chat--toggle--background: var(--chat--color-primary);\n  --chat--toggle--hover--background: var(--chat--color-primary-shade-50);\n  --chat--toggle--active--background: var(--chat--color-primary-shade-100);\n  --chat--toggle--color: var(--chat--color-white);\n}\n\n/* === CLASS OVERRIDES === */\n/*\n  These are essential for effects that CSS variables can't control,\n  like the glass blur, shadows, and max-height.\n*/\n\n.chat-window {\n  /* This is the magic for the glass effect! */\n  background-color: rgba(249, 243, 245, 0.6); /* A semi-transparent background color */\n  backdrop-filter: blur(20px);\n  -webkit-backdrop-filter: blur(20px); /* For Safari compatibility */\n\n  /* A subtle shadow helps lift the window off the page */\n  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);\n\n  /* Here we apply the max-height you wanted */\n  max-height: 750px;\n}\n\n/* Add top margin to the first message only for initial spacing */\n.chat-messages-list .chat-message:first-child {\n  margin-top: var(--chat--spacing);\n}\n\n/* Make user messages slightly wider for better balance */\n.chat-message.is-user {\n\tmax-width: 70%;\n}\n\n.chat-message.is-bot {\n\tmax-width: 80%;\n}\n\n/* Add a subtle glow to messages on hover */\n.chat-message {\n    transition: transform 0.2s ease, box-shadow 0.2s ease;\n}\n.chat-message:hover {\n    transform: translateY(-2px);\n    box-shadow: 0 0 25px 0 rgba(234, 75, 113, 0.2);\n}\n\n/* === PAGE BACKGROUND === */\n/* Your dotted background to simulate the n8n canvas. Perfect as is! */\nbody {\n    background-color: #FDFBFF;\n    background-image:\n        radial-gradient(circle at 1px 1px, rgba(0,0,0,0.07) 1px, transparent 0),\n        linear-gradient(135deg, #F9F3F5 0%, #EFF3FB 100%);\n    background-size: 25px 25px, 100% 100%;\n}"
+        }
+      },
+      "id": "1271281d-ab81-4039-96a3-0bc42024d6f8",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "RAG Chatbot",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1520,
+        2816
+      ],
+      "webhookId": "285e5d0b-ffcf-44e8-a80c-0683966b78a4",
+      "typeVersion": 1.1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Etapa 4 da Configuração: Converse com seu Especialista!\n\nParabéns, a base de conhecimento foi criada! Agora é hora de fazer uma pergunta ao especialista.\n\n**Ação:**\n1. **Ative** todo o fluxo de trabalho usando o botão de alternância na parte superior da tela.\n2. Abra o nó de gatilho de bate-papo **`RAG Chatbot`** (canto inferior esquerdo).\n3. Para conversar:\n* Copie a **URL Pública** e abra-a em uma nova aba do navegador.\n* OU clique no botão **\"Abrir Bate-papo\"** no painel do nó para testá-lo diretamente no n8n.\n\n**Experimente perguntar:** \"Como funciona o nó IF?\" ou \"O que é um subfluxo de trabalho?\"",
+        "height": 320,
+        "width": 624
+      },
+      "id": "2ff38f0f-91ef-45c0-a419-ffeffe9bfea3",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        400,
+        1600
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Etapa 1 da Configuração: Conecte suas Credenciais do Google AI\n\nEste fluxo de trabalho utiliza os modelos Gemini do Google para gerar embeddings e respostas de chat. Você precisará de uma chave de API do Google AI.\n\n**Ação:**\n1. Acesse qualquer um dos nós Gemini (por exemplo, **`Gemini 2.5 Flash`**).\n2. Clique no menu suspenso **Credencial** e selecione **`+ Criar Nova Credencial`**.\n3. Na janela que se abre, cole sua **Chave de API do Google AI**.\n4. Clique em **Salvar**. Sua nova credencial será criada e selecionada automaticamente para este nó.",
+        "height": 272,
+        "width": 656
+      },
+      "id": "a42e96aa-a212-4fd8-b3f5-b70738428112",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note24",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        400,
+        640
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Etapa 2 da Configuração: Aplicar Credenciais a Todos os Nós Gemini\n\nSua nova credencial do Google AI agora está salva. Vamos garantir que todos os outros nós Gemini a estejam usando.\n\n**Ação:**\nAcesse os nós Gemini restantes na tela. Sua nova credencial agora estará disponível nas listas suspensas de **Credenciais**. Basta selecioná-la para cada um.\n\n**Nós a serem verificados:**\n* `Gemini 2.5 Flash`\n* `Gemini Chunk Embedding`\n* `Gemini Query Embedding`",
+        "height": 304,
+        "width": 864
+      },
+      "id": "22d91015-7d89-4f1c-bd30-cc1387cc24a3",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note27",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        400,
+        928
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## Etapa 3 da Configuração: Construir a Base de Conhecimento (Indexação)\n\nEsta é a etapa única em que a IA \"lê\" toda a documentação.\n\n**Ação:**\n1. Encontre o nó de gatilho manual **`Iniciar Indexação`** no canto superior esquerdo da tela.\n2. Clique no botão **\"Executar fluxo de trabalho\"**.\n\n**⚠️ IMPORTANTE:**\n* **Seja paciente!** Este processo levará **15 a 20 minutos** para coletar, processar e armazenar toda a documentação do n8n na memória.\n* **A base de conhecimento é temporária.** Ela é armazenada na memória do n8n e será **apagada se você reiniciar sua instância do n8n**. Se isso acontecer, você deverá executar esta etapa de indexação novamente.",
+        "height": 336,
+        "width": 784
+      },
+      "id": "497629d6-8b1b-4ab8-9e37-98d21da5fdc2",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note28",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        400,
+        1248
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "7ab75be6-6cc7-4306-8f84-b101855cb65d",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Ingest Web Page",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "creator": "Lucas Peyrin",
+      "position": [
+        1680,
+        1680
+      ],
+      "typeVersion": 1.1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "content": "## https://n8n.io/creators/lucaspeyrin/",
+        "height": 80,
+        "width": 448,
+        "color": 2
+      },
+      "id": "6e3fc66d-e12e-4ef3-81c8-a205be1c26a0",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2544,
+        2352
+      ],
+      "typeVersion": 1,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "id",
+          "value": "n8n_documentation_vector_store"
+        },
+        "embeddingBatchSize": 30
+      },
+      "id": "85ff7226-9931-41d7-9ca5-c9a6f153fe26",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Simple Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "creator": "Lucas Peyrin",
+      "position": [
+        3472,
+        1680
+      ],
+      "typeVersion": 1.3,
+      "notes": "© 2025 Lucas Peyrin"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Obtenha partes relacionadas da documentação oficial do n8n.",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "id",
+          "value": "=n8n_documentation_vector_store"
+        },
+        "topK": 10,
+        "includeDocumentMetadata": false
+      },
+      "id": "e11b64ae-32ce-4fde-aba8-bbf6744b9edd",
+      "cid": "Ikx1Y2FzIFBleXJpbiI",
+      "name": "Official n8n Documentation",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "creator": "Lucas Peyrin",
+      "position": [
+        2128,
+        3424
+      ],
+      "typeVersion": 1.3,
+      "notes": "© 2025 Lucas Peyrin"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RAG Chatbot": {
+      "main": [
+        [
+          {
+            "node": "n8n Docs AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "n8n Docs AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Indexing": {
+      "main": [
+        [
+          {
+            "node": "Get All n8n Documentation Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest Web Page": {
+      "main": [
+        [
+          {
+            "node": "Get Documentation Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Links": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicate Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini 2.5 Flash": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "n8n Docs AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Documentation": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicate Documentation Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Keep Doc Paths": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Documentation Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chunk Embedding": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Query Embedding": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Official n8n Documentation",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Documentation Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Documentation Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicate Links": {
+      "main": [
+        [
+          {
+            "node": "Only Keep Doc Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Links from HTML": {
+      "main": [
+        [
+          {
+            "node": "Split Out Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Official n8n Documentation": {
+      "ai_tool": [
+        [
+          {
+            "node": "n8n Docs AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Documentation Content": {
+      "main": [
+        [
+          {
+            "node": "Clean Documentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Documentation Pages": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Add Documentation Page to Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All n8n Documentation Links": {
+      "main": [
+        [
+          {
+            "node": "Extract Links from HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Documentation Page to Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Documentation Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicate Documentation Content": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b73bf178-e329-4a22-987a-b0bf52e7f698",
+  "meta": {
+    "templateId": "6137",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "533f5b6c1f59272e48a8ae87cc0a9a23fb627cf49540aaa5a71be27575a69b56"
+  },
+  "id": "YWItOdsVidzbdHk3",
+  "tags": []
+}
